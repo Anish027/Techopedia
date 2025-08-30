@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLASSIFIED - OPERATION TRINITY VEIL - TERMINAL ACCESS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Special+Elite&family=Share+Tech+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --terminal-green: #00ff41;
+            --amber-glow: #ffb000;
+            --blood-red: #cc0000;
+            --paper-aged: #2a2520;
+            --ink-black: #0a0a0a;
+            --metal-rust: #8b4513;
+            --classified-stamp: #ff0000;
+            --screen-glow: #001100;
+            --static-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: var(--ink-black);
+            color: var(--terminal-green);
+            overflow-x: hidden;
+            cursor: crosshair;
+        }
+
+        /* Cinematic Background Layers */
+        .background-layers {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
+        }
+
+        .paper-texture {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 30% 20%, rgba(42, 37, 32, 0.8) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(139, 69, 19, 0.3) 0%, transparent 50%),
+                linear-gradient(45deg, var(--paper-aged) 0%, var(--ink-black) 100%);
+            opacity: 0.9;
+        }
+
+        .crt-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at center, var(--screen-glow) 0%, transparent 70%),
+                linear-gradient(0deg, transparent 50%, rgba(0, 255, 65, 0.02) 50%, transparent 52%);
+            animation: crtFlicker 0.15s infinite linear;
+        }
+
+        @keyframes crtFlicker {
+            0% { opacity: 1; }
+            98% { opacity: 1; }
+            99% { opacity: 0.98; }
+            100% { opacity: 1; }
+        }
+
+        .static-noise {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><filter id="noise"><feTurbulence baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"/></filter></defs><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.05"/></svg>');
+            animation: staticMove 0.1s infinite linear;
+        }
+
+        @keyframes staticMove {
+            0% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(-1px) translateY(1px); }
+            50% { transform: translateX(1px) translateY(-1px); }
+            75% { transform: translateX(-1px) translateY(-1px); }
+            100% { transform: translateX(1px) translateY(1px); }
+        }
+
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 98%, rgba(0, 255, 65, 0.1) 100%),
+                linear-gradient(0deg, transparent 98%, rgba(0, 255, 65, 0.1) 100%);
+            background-size: 50px 50px;
+            opacity: 0.3;
+        }
+
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                transparent 50%,
+                rgba(0, 255, 65, 0.03) 50%
+            );
+            background-size: 100% 4px;
+            animation: scanlineMove 0.1s linear infinite;
+        }
+
+        @keyframes scanlineMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 4px; }
+        }
+
+        /* Scrolling Code Background */
+        .code-scroll {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
+            color: rgba(0, 255, 65, 0.1);
+            z-index: -5;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .code-line {
+            position: absolute;
+            white-space: nowrap;
+            animation: scrollCode 20s linear infinite;
+        }
+
+        @keyframes scrollCode {
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Navigation Terminal */
+        .nav-terminal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(42, 37, 32, 0.9));
+            border-bottom: 2px solid var(--terminal-green);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-terminal::before {
+            content: '████ CLASSIFIED TERMINAL ACCESS ████ OPERATION TRINITY VEIL ████';
+            position: absolute;
+            top: -20px;
+            left: 0;
+            right: 0;
+            background: var(--blood-red);
+            color: white;
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 2px 0;
+            animation: classifiedPulse 1s infinite;
+        }
+
+        @keyframes classifiedPulse {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.7; }
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            margin-top: 20px;
+        }
+
+        .terminal-logo {
+            display: flex;
+            align-items: center;
+            font-family: 'Courier Prime', monospace;
+        }
+
+        .logo-badge {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--blood-red), var(--classified-stamp));
+            border: 3px solid var(--terminal-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            position: relative;
+            animation: badgeGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes badgeGlow {
+            from { box-shadow: 0 0 10px rgba(0, 255, 65, 0.5); }
+            to { box-shadow: 0 0 25px rgba(0, 255, 65, 0.8); }
+        }
+
+        .logo-badge::before {
+            content: 'TOP\ASECRET';
+            color: white;
+            font-size: 0.5rem;
+            font-weight: bold;
+            text-align: center;
+            line-height: 0.8;
+            transform: rotate(-10deg);
+        }
+
+        .logo-text {
+            color: var(--terminal-green);
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--amber-glow);
+            text-decoration: none;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.5rem 1rem;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-link::before {
+            content: '> ';
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-link:hover::before {
+            opacity: 1;
+        }
+
+        .nav-link:hover {
+            color: var(--terminal-green);
+            border-color: var(--terminal-green);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .nav-link.active {
+            background: rgba(0, 255, 65, 0.1);
+            border-color: var(--terminal-green);
+            color: var(--terminal-green);
+        }
+
+        /* Hero Terminal Section */
+        .hero-terminal {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding-top: 100px;
+        }
+
+        .classified-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .top-secret-banner {
+            background: var(--blood-red);
+            color: white;
+            padding: 0.8rem 3rem;
+            font-family: 'Special Elite', cursive;
+            font-size: 1.2rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+            margin-bottom: 2rem;
+            transform: rotate(-2deg);
+            box-shadow: 0 0 20px rgba(204, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .top-secret-banner::before,
+        .top-secret-banner::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            bottom: -5px;
+            width: 20px;
+            background: var(--blood-red);
+            transform: skew(-10deg);
+        }
+
+        .top-secret-banner::before { left: -10px; }
+        .top-secret-banner::after { right: -10px; }
+
+        .operation-title {
+            font-family: 'Courier Prime', monospace;
+            font-size: clamp(3rem, 8vw, 6rem);
+            color: var(--terminal-green);
+            text-shadow: 0 0 30px rgba(0, 255, 65, 0.8);
+            margin-bottom: 1rem;
+            animation: titleGlitch 3s ease-in-out infinite;
+        }
+
+        @keyframes titleGlitch {
+            0%, 90%, 100% { transform: translateX(0); }
+            91% { transform: translateX(-2px); }
+            92% { transform: translateX(2px); }
+            93% { transform: translateX(-1px); }
+            94% { transform: translateX(1px); }
+            95% { transform: translateX(0); }
+        }
+
+        .operation-subtitle {
+            font-family: 'Special Elite', cursive;
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: var(--amber-glow);
+            margin-bottom: 3rem;
+            text-shadow: 0 0 15px rgba(255, 176, 0, 0.5);
+        }
+
+        .terminal-window {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid var(--terminal-green);
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--terminal-green);
+        }
+
+        .terminal-lights {
+            display: flex;
+            gap: 0.5rem;
+            margin-right: 1rem;
+        }
+
+        .terminal-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: lightBlink 2s infinite;
+        }
+
+        .terminal-light.red { background: var(--blood-red); }
+        .terminal-light.amber { background: var(--amber-glow); animation-delay: 0.5s; }
+        .terminal-light.green { background: var(--terminal-green); animation-delay: 1s; }
+
+        @keyframes lightBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .terminal-title {
+            color: var(--terminal-green);
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .terminal-content {
+            font-family: 'Share Tech Mono', monospace;
+            line-height: 1.6;
+        }
+
+        .terminal-line {
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: typeIn 0.5s ease-out forwards;
+        }
+
+        .terminal-line:nth-child(1) { animation-delay: 0.5s; }
+        .terminal-line:nth-child(2) { animation-delay: 1s; }
+        .terminal-line:nth-child(3) { animation-delay: 1.5s; }
+        .terminal-line:nth-child(4) { animation-delay: 2s; }
+        .terminal-line:nth-child(5) { animation-delay: 2.5s; }
+
+        @keyframes typeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .cursor {
+            display: inline-block;
+            background: var(--terminal-green);
+            width: 8px;
+            height: 1.2em;
+            animation: cursorBlink 1s infinite;
+        }
+
+        @keyframes cursorBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .redacted {
+            background: var(--ink-black);
+            color: var(--ink-black);
+            padding: 0 0.5rem;
+            position: relative;
+        }
+
+        .redacted::before {
+            content: '████████';
+            position: absolute;
+            top: 0;
+            left: 0;
+            color: var(--ink-black);
+            background: var(--ink-black);
+        }
+
+        .access-btn {
+            background: linear-gradient(45deg, var(--blood-red), var(--classified-stamp));
+            color: white;
+            border: 2px solid var(--terminal-green);
+            padding: 1rem 2rem;
+            font-family: 'Courier Prime', monospace;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .access-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .access-btn:hover::before {
+            left: 100%;
+        }
+
+        .access-btn:hover {
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.5);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        /* File Folder Operations */
+        .operations-archive {
+            padding: 5rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .archive-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .archive-title {
+            font-family: 'Special Elite', cursive;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            color: var(--amber-glow);
+            text-shadow: 0 0 20px rgba(255, 176, 0, 0.5);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .archive-subtitle {
+            color: var(--terminal-green);
+            font-size: 1.2rem;
+            font-style: italic;
+        }
+
+        .file-folders {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            perspective: 1000px;
+        }
+
+        .file-folder {
+            background: linear-gradient(135deg, var(--paper-aged), #1a1a1a);
+            border: 2px solid var(--metal-rust);
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            transition: all 0.4s ease;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .file-folder:hover {
+            transform: rotateY(-5deg) rotateX(5deg);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .folder-tab {
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            background: var(--amber-glow);
+            color: var(--ink-black);
+            padding: 0.5rem 1.5rem;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
+            transform: perspective(100px) rotateX(-15deg);
+        }
+
+        .folder-content {
+            padding: 3rem 2rem 2rem;
+            position: relative;
+        }
+
+        .classification-stamp {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--blood-red);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.7rem;
+            font-weight: bold;
+            transform: rotate(15deg);
+            border-radius: 3px;
+        }
+
+        .file-title {
+            font-family: 'Special Elite', cursive;
+            font-size: 1.4rem;
+            color: var(--terminal-green);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .file-code {
+            color: var(--amber-glow);
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .file-description {
+            color: #cccccc;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-objective {
+            background: rgba(0, 0, 0, 0.5);
+            border-left: 4px solid var(--terminal-green);
+            padding: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--terminal-green);
+        }
+
+        .file-objective::before {
+            content: '>>> MISSION OBJECTIVE: ';
+            color: var(--blood-red);
+            font-weight: bold;
+        }
+
+        /* Timeline Briefing */
+        .timeline-briefing {
+            padding: 5rem 2rem;
+            background: linear-gradient(135deg, rgba(42, 37, 32, 0.3), rgba(10, 10, 10, 0.9));
+            position: relative;
+        }
+
+        .timeline-briefing::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--blood-red),
+                var(--blood-red) 15px,
+                transparent 15px,
+                transparent 30px
+            );
+            opacity: 0.3;
+        }
+
+        .briefing-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 150px;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--terminal-green), var(--amber-glow));
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(42, 37, 32, 0.6));
+            border: 2px solid var(--metal-rust);
+            padding: 2rem;
+            margin: 0 3rem;
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: 30px;
+            width: 0;
+            height: 0;
+            border: 20px solid transparent;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content::before {
+            right: -40px;
+            border-left-color: var(--metal-rust);
+        }
+
+        .timeline-item:nth-child(even) .timeline-content::before {
+            left: -40px;
+            border-right-color: var(--metal-rust);
+        }
+
+        .timeline-dot {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, var(--terminal-green), var(--amber-glow));
+            border: 4px solid var(--ink-black);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            animation: dotPulse 2s infinite;
+        }
+
+        @keyframes dotPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 65, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 65, 0.8); }
+        }
+
+        .phase-badge {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--blood-red);
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-radius: 20px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .timeline-title {
+            font-family: 'Special Elite', cursive;
+            color: var(--terminal-green);
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .timeline-duration {
+            color: var(--amber-glow);
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Intelligence Briefing */
+        .intel-briefing {
+            padding: 5rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .intel-briefing::before {
+            content: 'INTELLIGENCE BRIEFING';
+            position: absolute;
+            top: 3rem;
+            right: 3rem;
+            color: var(--blood-red);
+            font-size: 2rem;
+            font-weight: bold;
+            opacity: 0.2;
+            transform: rotate(-15deg);
+            font-family: 'Special Elite', cursive;
+        }
+
+        .briefing-file {
+            background: linear-gradient(135deg, var(--paper-aged), rgba(26, 26, 26, 0.9));
+            border: 2px solid var(--metal-rust);
+            margin-bottom: 1.5rem;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .briefing-question {
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.8), rgba(42, 37, 32, 0.6));
+            color: var(--terminal-green);
+            padding: 1.5rem;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-family: 'Courier Prime', monospace;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .briefing-question::before {
+            content: '[CLASSIFIED] ';
+            color: var(--blood-red);
+            font-weight: bold;
+        }
+
+        .briefing-question::after {
+            content: '[EXPAND FILE]';
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            color: var(--amber-glow);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .briefing-question:hover {
+            background: linear-gradient(90deg, rgba(0, 255, 65, 0.1), rgba(42, 37, 32, 0.8));
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        .briefing-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            color: #cccccc;
+            line-height: 1.6;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .briefing-answer.active {
+            padding: 1.5rem;
+            max-height: 400px;
+        }
+
+        .briefing-answer::before {
+            content: '[DECLASSIFIED RESPONSE] ';
+            color: var(--amber-glow);
+            font-weight: bold;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Command Center Footer */
+        .command-center {
+            background: linear-gradient(135deg, var(--paper-aged), var(--ink-black));
+            border-top: 4px solid var(--terminal-green);
+            padding: 4rem 2rem 2rem;
+            position: relative;
+        }
+
+        .command-center::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--terminal-green),
+                var(--terminal-green) 30px,
+                transparent 30px,
+                transparent 60px
+            );
+            opacity: 0.5;
+        }
+
+        .command-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .command-panel {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(42, 37, 32, 0.7));
+            border: 2px solid var(--metal-rust);
+            border-radius: 8px;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .command-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--terminal-green), var(--amber-glow), var(--terminal-green));
+            border-radius: 8px 8px 0 0;
+        }
+
+        .panel-header {
+            font-family: 'Special Elite', cursive;
+            color: var(--terminal-green);
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--terminal-green);
+            padding-bottom: 0.5rem;
+        }
+
+        .command-seal {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, var(--blood-red), var(--classified-stamp));
+            border: 4px solid var(--terminal-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-align: center;
+            line-height: 1.2;
+            animation: sealRotate 10s linear infinite;
+        }
+
+        @keyframes sealRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .agency-info {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .agency-name {
+            font-family: 'Special Elite', cursive;
+            color: var(--terminal-green);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .agency-division {
+            color: var(--amber-glow);
+            font-size: 0.9rem;
+        }
+
+        .contact-terminal {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--terminal-green);
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--terminal-green);
+            margin-bottom: 2rem;
+        }
+
+        .contact-terminal::before {
+            content: '> SECURE COMMUNICATION CHANNELS:\A';
+            white-space: pre;
+            color: var(--amber-glow);
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--terminal-green);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--metal-rust);
+            border-radius: 4px;
+            color: var(--terminal-green);
+            padding: 0.8rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--terminal-green);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .transmit-btn {
+            background: linear-gradient(45deg, var(--blood-red), var(--classified-stamp));
+            color: white;
+            border: 2px solid var(--terminal-green);
+            border-radius: 4px;
+            padding: 1rem 2rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .transmit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .transmit-btn:hover::before {
+            left: 100%;
+        }
+
+        .transmit-btn:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .security-warning {
+            background: var(--blood-red);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-top: 3rem;
+            font-family: 'Share Tech Mono', monospace;
+            animation: warningBlink 2s infinite;
+        }
+
+        @keyframes warningBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.7; }
+        }
+
+        /* Access Granted Popup */
+        .access-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(42, 37, 32, 0.9));
+            border: 3px solid var(--terminal-green);
+            border-radius: 8px;
+            padding: 2rem;
+            z-index: 10000;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.5);
+            display: none;
+        }
+
+        .access-popup.show {
+            display: block;
+            animation: popupGlow 0.5s ease-out;
+        }
+
+        @keyframes popupGlow {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .popup-title {
+            color: var(--terminal-green);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 15px rgba(0, 255, 65, 0.8);
+        }
+
+        .popup-message {
+            color: var(--amber-glow);
+            margin-bottom: 1.5rem;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .timeline-line {
+                left: 30px;
+            }
+            
+            .timeline-item {
+                flex-direction: row !important;
+                padding-left: 70px;
+            }
+            
+            .timeline-dot {
+                left: 30px;
+            }
+            
+            .timeline-content {
+                margin: 0;
+            }
+
+            .timeline-content::before {
+                display: none;
+            }
+
+            .command-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .file-folders {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Layers -->
+    <div class="background-layers">
+        <div class="paper-texture"></div>
+        <div class="crt-glow"></div>
+        <div class="static-noise"></div>
+        <div class="grid-overlay"></div>
+        <div class="scanlines"></div>
+    </div>
+
+    <!-- Scrolling Code Background -->
+    <div class="code-scroll" id="codeScroll"></div>
+
+    <!-- Navigation Terminal -->
+    <nav class="nav-terminal">
+        <div class="nav-container">
+            <div class="terminal-logo">
+                <div class="logo-badge"></div>
+                <div class="logo-text">TRINITY VEIL TERMINAL</div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-link active">HOME</a></li>
+                <li><a href="#operations" class="nav-link">OPERATIONS</a></li>
+                <li><a href="#timeline" class="nav-link">TIMELINE</a></li>
+                <li><a href="#intel" class="nav-link">INTEL</a></li>
+                <li><a href="#command" class="nav-link">COMMAND</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Terminal Section -->
+    <section class="hero-terminal">
+        <div class="classified-header">
+            <div class="top-secret-banner">TOP SECRET - EYES ONLY</div>
+            <h1 class="operation-title">OPERATION TRINITY VEIL</h1>
+            <p class="operation-subtitle">Classified Cyber Warfare Initiative</p>
+        </div>
+        
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-lights">
+                    <div class="terminal-light red"></div>
+                    <div class="terminal-light amber"></div>
+                    <div class="terminal-light green"></div>
+                </div>
+                <div class="terminal-title">SECURE TERMINAL ACCESS</div>
+            </div>
+            
+            <div class="terminal-content">
+                <div class="terminal-line">> AUTHENTICATING USER CREDENTIALS...</div>
+                <div class="terminal-line">> CLEARANCE LEVEL: <span class="redacted">ULTRA SECRET</span></div>
+                <div class="terminal-line">> ACCESSING CLASSIFIED DATABASE...</div>
+                <div class="terminal-line">> OPERATION STATUS: ACTIVE</div>
+                <div class="terminal-line">> MISSION BRIEFING: <span class="redacted">CYBER WARFARE PROTOCOLS</span></div>
+                <div class="terminal-line">> AWAITING COMMAND INPUT<span class="cursor"></span></div>
+            </div>
+        </div>
+        
+        <button class="access-btn" onclick="showAccessPopup()">
+            INITIATE SECURE ACCESS
+        </button>
+    </section>
+
+    <!-- Operations Archive -->
+    <section class="operations-archive" id="operations">
+        <div class="archive-header">
+            <h2 class="archive-title">Classified Operations Archive</h2>
+            <p class="archive-subtitle">Authorized Personnel Only - Security Clearance Required</p>
+        </div>
+        
+        <div class="file-folders">
+            <div class="file-folder">
+                <div class="folder-tab">FILE 001</div>
+                <div class="classification-stamp">TOP SECRET</div>
+                <div class="folder-content">
+                    <h3 class="file-title">Operation Firewall Breach</h3>
+                    <div class="file-code">CLASSIFICATION: TS-NOFORN-001</div>
+                    <p class="file-description">
+                        Authorized penetration testing of critical infrastructure networks. Operatives will conduct systematic vulnerability assessments using advanced exploitation frameworks while maintaining strict ethical protocols.
+                    </p>
+                    <div class="file-objective">
+                        Identify and document security weaknesses in simulated corporate environments. Develop countermeasures for discovered vulnerabilities.
+                    </div>
+                </div>
+            </div>
+
+            <div class="file-folder">
+                <div class="folder-tab">FILE 002</div>
+                <div class="classification-stamp">CLASSIFIED</div>
+                <div class="folder-content">
+                    <h3 class="file-title">Digital Forensics Protocol</h3>
+                    <div class="file-code">CLASSIFICATION: C-REL-002</div>
+                    <p class="file-description">
+                        Investigation of cyber incidents through advanced digital forensics techniques. Analyze compromised systems, recover deleted evidence, and reconstruct attack vectors used by hostile actors.
+                    </p>
+                    <div class="file-objective">
+                        Master professional forensics tools and methodologies. Develop skills in evidence preservation and chain of custody procedures.
+                    </div>
+                </div>
+            </div>
+
+            <div class="file-folder">
+                <div class="folder-tab">FILE 003</div>
+                <div class="classification-stamp">SECRET</div>
+                <div class="folder-content">
+                    <h3 class="file-title">Social Engineering Defense</h3>
+                    <div class="file-code">CLASSIFICATION: S-REL-003</div>
+                    <p class="file-description">
+                        Study of human psychology in cybersecurity contexts. Learn to identify and defend against social engineering attacks through controlled simulations and awareness training programs.
+                    </p>
+                    <div class="file-objective">
+                        Develop comprehensive defense strategies against phishing, pretexting, and other human-targeted attack vectors.
+                    </div>
+                </div>
+            </div>
+
+            <div class="file-folder">
+                <div class="folder-tab">FILE 004</div>
+                <div class="classification-stamp">TOP SECRET</div>
+                <div class="folder-content">
+                    <h3 class="file-title">Cryptanalysis Operations</h3>
+                    <div class="file-code">CLASSIFICATION: TS-SCI-004</div>
+                    <p class="file-description">
+                        Breaking historical and modern encryption methods to understand cryptographic weaknesses. Analyze cipher systems used throughout military history and develop stronger protocols.
+                    </p>
+                    <div class="file-objective">
+                        Decrypt intercepted communications and develop next-generation encryption protocols for future operations.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Briefing -->
+    <section class="timeline-briefing" id="timeline">
+        <div class="briefing-container">
+            <div class="archive-header">
+                <h2 class="archive-title">Operation Timeline</h2>
+                <p class="archive-subtitle">Chronological Deployment Schedule - Classified</p>
+            </div>
+            <div class="timeline-line"></div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="phase-badge">PHASE ALPHA</div>
+                <div class="timeline-content">
+                    <h3 class="timeline-title">Intelligence Gathering</h3>
+                    <div class="timeline-duration">DURATION: 2 WEEKS</div>
+                    <p>Conduct preliminary reconnaissance and establish secure communication protocols. Gather intelligence on target systems and identify potential vulnerabilities through passive scanning techniques.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="phase-badge">PHASE BRAVO</div>
+                <div class="timeline-content">
+                    <h3 class="timeline-title">Active Penetration</h3>
+                    <div class="timeline-duration">DURATION: 2 WEEKS</div>
+                    <p>Execute controlled penetration tests on authorized systems. Document discovered vulnerabilities and develop exploitation techniques within strict ethical boundaries and legal frameworks.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="phase-badge">PHASE CHARLIE</div>
+                <div class="timeline-content">
+                    <h3 class="timeline-title">Defense Implementation</h3>
+                    <div class="timeline-duration">DURATION: 2 WEEKS</div>
+                    <p>Design and implement comprehensive security countermeasures based on discovered vulnerabilities. Train personnel on new defense protocols and incident response procedures.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="phase-badge">PHASE DELTA</div>
+                <div class="timeline-content">
+                    <h3 class="timeline-title">Final Assessment</h3>
+                    <div class="timeline-duration">DURATION: 1 WEEK</div>
+                    <p>Conduct comprehensive security audit and prepare classified report for command review. Evaluate operation success metrics and plan future cyber defense initiatives.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Intelligence Briefing -->
+    <section class="intel-briefing" id="intel">
+        <div class="archive-header">
+            <h2 class="archive-title">Intelligence Briefing</h2>
+            <p class="archive-subtitle">Classified Information - Authorized Personnel Only</p>
+        </div>
+        
+        <div class="briefing-file">
+            <button class="briefing-question" onclick="toggleBriefing(this)">
+                What is Operation Trinity Veil?
+            </button>
+            <div class="briefing-answer">
+                A comprehensive ethical hacking program designed to train cybersecurity professionals in both defensive and offensive security techniques. All activities are conducted within legal boundaries and ethical frameworks, focusing on authorized penetration testing and security assessment methodologies.
+            </div>
+        </div>
+
+        <div class="briefing-file">
+            <button class="briefing-question" onclick="toggleBriefing(this)">
+                What security clearance is required for participation?
+            </button>
+            <div class="briefing-answer">
+                Participants receive temporary security clearance for training purposes. No prior cybersecurity experience is required, though basic computer literacy and understanding of networking concepts is recommended for optimal learning outcomes.
+            </div>
+        </div>
+
+        <div class="briefing-file">
+            <button class="briefing-question" onclick="toggleBriefing(this)">
+                Are all hacking activities conducted legally?
+            </button>
+            <div class="briefing-answer">
+                Absolutely. All penetration testing and security assessments are conducted exclusively on authorized systems within controlled laboratory environments. We strictly adhere to ethical hacking principles, legal guidelines, and industry best practices.
+            </div>
+        </div>
+
+        <div class="briefing-file">
+            <button class="briefing-question" onclick="toggleBriefing(this)">
+                What tools and techniques are covered in training?
+            </button>
+            <div class="briefing-answer">
+                Training covers industry-standard tools including Kali Linux, Metasploit Framework, Wireshark, Nmap, Burp Suite, and various digital forensics software. Techniques include network security assessment, web application testing, wireless security, and incident response procedures.
+            </div>
+        </div>
+
+        <div class="briefing-file">
+            <button class="briefing-question" onclick="toggleBriefing(this)">
+                What is the duration of the complete training program?
+            </button>
+            <div class="briefing-answer">
+                The complete operation spans 7 weeks with intensive hands-on training sessions. Participants can expect 4-6 hours of practical exercises per week, plus theoretical briefings and assessment periods. Additional time may be required for advanced certification tracks.
+            </div>
+        </div>
+    </section>
+
+    <!-- Command Center Footer -->
+    <footer class="command-center" id="command">
+        <div class="command-container">
+            <!-- Command Authority -->
+            <div class="command-panel">
+                <h3 class="panel-header">Command Authority</h3>
+                <div class="command-seal">IEEE<br>CYBER<br>COMMAND</div>
+                <div class="agency-info">
+                    <div class="agency-name">IEEE SIESGST</div>
+                    <div class="agency-division">Cybersecurity & Ethical Hacking Division</div>
+                </div>
+                <div class="contact-terminal">
+                    ENCRYPTED EMAIL: cyber@ieee-siesgst.org
+                    SECURE LINE: +91-XXXX-XXXX
+                    LOCATION: SIES Graduate School of Technology
+                    SECTOR: Nerul, Navi Mumbai, Maharashtra
+                    CLEARANCE: CONFIDENTIAL
+                </div>
+            </div>
+
+            <!-- Mission Status -->
+            <div class="command-panel">
+                <h3 class="panel-header">Mission Status</h3>
+                <div class="contact-terminal">
+                    > OPERATION STATUS: ACTIVE
+                    > SECURITY LEVEL: MAXIMUM
+                    > PERSONNEL: AUTHORIZED ONLY
+                    > MISSION OBJECTIVE: CYBER DEFENSE TRAINING
+                    > THREAT LEVEL: CONTROLLED
+                    > NEXT BRIEFING: CLASSIFIED
+                </div>
+                <div style="color: var(--amber-glow); text-align: center; margin-top: 1rem; font-family: 'Share Tech Mono', monospace;">
+                    ⚠️ ALL COMMUNICATIONS MONITORED ⚠️
+                </div>
+            </div>
+
+            <!-- Secure Communication -->
+            <div class="command-panel">
+                <h3 class="panel-header">Secure Communication</h3>
+                <form onsubmit="handleSecureTransmission(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="agent-id">Agent ID / Email</label>
+                        <input type="email" id="agent-id" class="form-input" placeholder="agent@secure.mil" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="clearance-level">Clearance Level</label>
+                        <select id="clearance-level" class="form-input" required>
+                            <option value="">Select Clearance</option>
+                            <option value="confidential">CONFIDENTIAL</option>
+                            <option value="secret">SECRET</option>
+                            <option value="top-secret">TOP SECRET</option>
+                            <option value="ultra">ULTRA (Special Access)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="secure-message">Classified Message</label>
+                        <textarea id="secure-message" class="form-input" rows="4" placeholder="Enter encrypted message..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="transmit-btn">TRANSMIT SECURE MESSAGE</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="security-warning">
+            ⚠️ SECURITY NOTICE: This system is for authorized use only. All activities are logged and monitored. 
+            Unauthorized access attempts will be reported to appropriate authorities and may result in prosecution. ⚠️
+        </div>
+    </footer>
+
+    <!-- Access Granted Popup -->
+    <div class="access-popup" id="accessPopup">
+        <div class="popup-title">ACCESS GRANTED</div>
+        <div class="popup-message">
+            SECURITY CLEARANCE VERIFIED<br>
+            WELCOME TO OPERATION TRINITY VEIL<br>
+            CLASSIFIED SYSTEMS UNLOCKED
+        </div>
+        <button onclick="closeAccessPopup()" style="background: var(--terminal-green); color: var(--ink-black); border: none; padding: 0.5rem 1rem; cursor: pointer;">CONTINUE</button>
+    </div>
+
+    <script>
+        // Initialize scrolling code background
+        function initCodeScroll() {
+            const codeContainer = document.getElementById('codeScroll');
+            const codeLines = [
+                'CLASSIFIED: 0x7F4A2B8C9D1E3F5A',
+                'DECRYPT: AES-256-CBC-HMAC-SHA256',
+                'ACCESS_TOKEN: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9',
+                'FIREWALL_STATUS: ACTIVE - PORT_SCAN_DETECTED',
+                'INTRUSION_ALERT: 192.168.1.247 - BLOCKED',
+                'CIPHER_KEY: 4D7A9B2F8E1C6A3D5B7F9E2A8C4D6B1F',
+                'OPERATION_CODE: TRINITY_VEIL_ALPHA_7',
+                'SECURITY_LEVEL: ULTRA_SECRET_NOFORN',
+                'AUTHENTICATION: BIOMETRIC_VERIFIED',
+                'NETWORK_STATUS: SECURE_CHANNEL_ESTABLISHED'
+            ];
+
+            function createCodeLine(text, delay) {
+                setTimeout(() => {
+                    const line = document.createElement('div');
+                    line.className = 'code-line';
+                    line.textContent = '> ' + text;
+                    line.style.top = Math.random() * 100 + 'vh';
+                    line.style.animationDelay = Math.random() * 2 + 's';
+                    codeContainer.appendChild(line);
+
+                    setTimeout(() => {
+                        if (codeContainer.contains(line)) {
+                            codeContainer.removeChild(line);
+                        }
+                    }, 20000);
+                }, delay);
+            }
+
+            // Create initial lines
+            codeLines.forEach((line, index) => {
+                createCodeLine(line, index * 2000);
+            });
+
+            // Continue creating lines
+            setInterval(() => {
+                const randomLine = codeLines[Math.floor(Math.random() * codeLines.length)];
+                createCodeLine(randomLine, 0);
+            }, 3000);
+        }
+
+        // Show access popup
+        function showAccessPopup() {
+            const popup = document.getElementById('accessPopup');
+            popup.classList.add('show');
+            
+            // Auto close after 3 seconds
+            setTimeout(() => {
+                closeAccessPopup();
+            }, 3000);
+        }
+
+        // Close access popup
+        function closeAccessPopup() {
+            const popup = document.getElementById('accessPopup');
+            popup.classList.remove('show');
+            
+            // Scroll to operations
+            document.querySelector('.operations-archive').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // Toggle intelligence briefing
+        function toggleBriefing(button) {
+            const answer = button.nextElementSibling;
+            const isActive = answer.classList.contains('active');
+            
+            // Close all other briefings
+            document.querySelectorAll('.briefing-answer').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.briefing-question').forEach(item => {
+                item.style.setProperty('--after-content', '"[EXPAND FILE]"');
+            });
+            
+            // Toggle current briefing
+            if (!isActive) {
+                answer.classList.add('active');
+                button.style.setProperty('--after-content', '"[COLLAPSE FILE]"');
+            }
+        }
+
+        // Handle secure transmission
+        function handleSecureTransmission(event) {
+            event.preventDefault();
+            
+            const agentId = document.getElementById('agent-id').value;
+            const clearance = document.getElementById('clearance-level').value;
+            const message = document.getElementById('secure-message').value;
+            
+            // Show transmission sequence
+            const loadingPopup = document.createElement('div');
+            loadingPopup.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(42, 37, 32, 0.9));
+                border: 3px solid var(--terminal-green);
+                border-radius: 8px;
+                padding: 2rem;
+                z-index: 10000;
+                text-align: center;
+                color: var(--terminal-green);
+                font-family: 'Share Tech Mono', monospace;
+                box-shadow: 0 0 50px rgba(0, 255, 65, 0.5);
+            `;
+            loadingPopup.innerHTML = `
+                <div style="font-size: 1.2rem; margin-bottom: 1rem;">🔒 ENCRYPTING MESSAGE...</div>
+                <div>ESTABLISHING SECURE CHANNEL...</div>
+                <div>AUTHENTICATING CLEARANCE LEVEL...</div>
+                <div>TRANSMITTING TO COMMAND CENTER...</div>
+            `;
+            document.body.appendChild(loadingPopup);
+            
+            setTimeout(() => {
+                document.body.removeChild(loadingPopup);
+                alert(`✅ SECURE TRANSMISSION COMPLETE\n\n` +
+                      `Agent ID: ${agentId}\n` +
+                      `Clearance: ${clearance.toUpperCase()}\n` +
+                      `Message: [ENCRYPTED]\n\n` +
+                      `Your classified message has been received by Command Center.\n` +
+                      `Expect response through secure channels within 24-48 hours.`);
+                event.target.reset();
+            }, 4000);
+        }
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Active nav link highlighting
+        function updateActiveNavLink() {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 150;
+                if (window.pageYOffset >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}` || 
+                    (current === '' && link.getAttribute('href') === '#')) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNavLink);
+
+        // Random glitch effects
+        function addGlitchEffects() {
+            const glitchElements = document.querySelectorAll('.operation-title, .archive-title');
+            
+            setInterval(() => {
+                const randomElement = glitchElements[Math.floor(Math.random() * glitchElements.length)];
+                randomElement.style.textShadow = `
+                    ${Math.random() * 4 - 2}px 0 #ff0000,
+                    ${Math.random() * 4 - 2}px 0 #00ff00,
+                    ${Math.random() * 4 - 2}px 0 #0000ff
+                `;
+                
+                setTimeout(() => {
+                    randomElement.style.textShadow = '0 0 30px rgba(0, 255, 65, 0.8)';
+                }, 100);
+            }, 8000);
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initCodeScroll();
+            addGlitchEffects();
+            
+            // Add typing effect to terminal lines
+            const terminalLines = document.querySelectorAll('.terminal-line');
+            terminalLines.forEach((line, index) => {
+                const text = line.textContent;
+                line.textContent = '';
+                
+                setTimeout(() => {
+                    let i = 0;
+                    const typeInterval = setInterval(() => {
+                        line.textContent += text[i];
+                        i++;
+                        if (i >= text.length) {
+                            clearInterval(typeInterval);
+                        }
+                    }, 50);
+                }, (index + 1) * 1000);
+            });
+        });
+
+        // Add screen flicker effect occasionally
+        setInterval(() => {
+            document.body.style.filter = 'brightness(1.1) contrast(1.1)';
+            setTimeout(() => {
+                document.body.style.filter = 'none';
+            }, 50);
+        }, 15000);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97717422f027bdd5',t:'MTc1NjUyNzE4Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
